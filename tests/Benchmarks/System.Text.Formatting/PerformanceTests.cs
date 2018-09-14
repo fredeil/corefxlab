@@ -21,7 +21,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatIntDec()
         {
-            StringFormatter sb = new StringFormatter(numbersToWrite, pool);
+            var sb = new StringFormatter(numbersToWrite, pool);
             for (int i = 0; i < numbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)));
@@ -36,7 +36,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatIntDecClr()
         {
-            StringBuilder sb = new StringBuilder(numbersToWrite);
+            var sb = new StringBuilder(numbersToWrite);
             for (int i = 0; i < numbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)));
@@ -51,8 +51,8 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatIntHex()
         {
-            StringFormatter sb = new StringFormatter(numbersToWrite, pool);
-            StandardFormat format = new StandardFormat('X', StandardFormat.NoPrecision);
+            var sb = new StringFormatter(numbersToWrite, pool);
+            var format = new StandardFormat('X', StandardFormat.NoPrecision);
 
             for (int i = 0; i < numbersToWrite; i++)
             {
@@ -102,7 +102,7 @@ namespace System.Text.Formatting.Benchmarks
             var guid = Guid.NewGuid();
             var guidsToWrite = numbersToWrite / 10;
 
-            StringFormatter sb = new StringFormatter(guidsToWrite * 36, pool);
+            var sb = new StringFormatter(guidsToWrite * 36, pool);
             for (int i = 0; i < guidsToWrite; i++)
             {
                 sb.Append(guid);
@@ -152,21 +152,18 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void CustomCultureFormatClr()
         {
-            StringBuilder sb = new StringBuilder(numbersToWrite * 3);
+            var sb = new StringBuilder(numbersToWrite * 3);
             var culture = new CultureInfo("th");
 
-            for (int itteration = 0; itteration < itterationsCulture; itteration++)
+            sb.Clear();
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                sb.Clear();
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(((i % 128) + 100).ToString(culture));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite * 3)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(((i % 128) + 100).ToString(culture));
+            }
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite * 3)
+            {
+                throw new Exception("test failed");
             }
         }
 
@@ -176,7 +173,7 @@ namespace System.Text.Formatting.Benchmarks
             string text = "Hello World!";
             int stringsToWrite = 2000;
             int size = stringsToWrite * text.Length + stringsToWrite;
-            ArrayFormatter formatter = new ArrayFormatter(size, SymbolTable.InvariantUtf8, pool);
+            var formatter = new ArrayFormatter(size, SymbolTable.InvariantUtf8, pool);
 
             formatter.Clear();
             for (int i = 0; i < stringsToWrite; i++)
@@ -192,7 +189,7 @@ namespace System.Text.Formatting.Benchmarks
             string text = "Hello World!";
             int stringsToWrite = 2000;
             int size = stringsToWrite * text.Length + stringsToWrite;
-            StringBuilder formatter = new StringBuilder(size);
+            var formatter = new StringBuilder(size);
 
             formatter.Clear();
             for (int i = 0; i < stringsToWrite; i++)
@@ -211,7 +208,7 @@ namespace System.Text.Formatting.Benchmarks
             {
                 char digitChar = (char)(digit + 'A');
                 var digitString = new string(digitChar, 1);
-                utf16digitsAndSymbols[digit] = GetBytesUtf16(digitString);
+                utf16digitsAndSymbols[digit] = Encoding.Unicode.GetBytes(digitString);
             }
 
             utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = Encoding.Unicode.GetBytes(".");
@@ -219,6 +216,36 @@ namespace System.Text.Formatting.Benchmarks
             utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = Encoding.Unicode.GetBytes("_?");
 
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
+        }
+
+        struct Age : IBufferFormattable
+        {
+            int _age;
+            bool _inMonths;
+
+            public Age(int age, bool inMonths = false)
+            {
+                _age = age;
+                _inMonths = inMonths;
+            }
+
+            public bool TryFormat(Span<byte> buffer, out int bytesWritten, StandardFormat format, SymbolTable symbolTable)
+            {
+                if (!CustomFormatter.TryFormat(_age, buffer, out bytesWritten, format, symbolTable))
+                    return false;
+
+                char symbol = _inMonths ? 'm' : 'y';
+                if (!symbolTable.TryEncode((byte)symbol, buffer.Slice(bytesWritten), out int written))
+                    return false;
+
+                bytesWritten += written;
+                return true;
+            }
+
+            public override string ToString()
+            {
+                return _age.ToString() + (_inMonths ? "m" : "y");
+            }
         }
     }
 }
