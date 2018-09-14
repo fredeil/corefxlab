@@ -1,4 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
@@ -7,11 +7,10 @@ using System.Buffers.Text;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
-namespace System.Text.Formatting.Tests
+namespace System.Text.Formatting.Benchmarks
 {
     public class PerfSmokeTests
     {
@@ -27,7 +26,6 @@ namespace System.Text.Formatting.Tests
             //Trace.WriteLine(string.Format("{0} : Elapsed {1}ms", memberName, timer.ElapsedMilliseconds));
         }
 
-        [Fact]
         private void InvariantFormatIntDec()
         {
             timer.Restart();
@@ -47,7 +45,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void InvariantFormatIntDecClr()
         {
             timer.Restart();
@@ -67,7 +64,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void InvariantFormatIntHex()
         {
             StandardFormat format = new StandardFormat('X', StandardFormat.NoPrecision);
@@ -89,7 +85,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void InvariantFormatIntHexClr()
         {
             timer.Restart();
@@ -109,7 +104,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void InvariantFormatStruct()
         {
             timer.Restart();
@@ -129,7 +123,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void FormatGuid()
         {
             var guid = Guid.NewGuid();
@@ -151,7 +144,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void InvariantFormatStructClr()
         {
             timer.Restart();
@@ -171,7 +163,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void CustomCultureFormat()
         {
             StringFormatter sb = new StringFormatter(numbersToWrite * 3, pool);
@@ -195,7 +186,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void CustomCultureFormatClr()
         {
             StringBuilder sb = new StringBuilder(numbersToWrite * 3);
@@ -218,7 +208,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void EncodeStringToUtf8()
         {
             string text = "Hello World!";
@@ -240,7 +229,6 @@ namespace System.Text.Formatting.Tests
             PrintTime();
         }
 
-        [Fact]
         private void EncodeStringToUtf8Clr()
         {
             string text = "Hello World!";
