@@ -4,9 +4,11 @@
 
 using System.Buffers;
 using System.Buffers.Text;
+using System.Text.Encoding;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using BenchmarkDotNet.Attributes;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -14,153 +16,118 @@ namespace System.Text.Formatting.Benchmarks
 {
     public class PerfSmokeTests
     {
-        static ArrayPool<byte> pool = ArrayPool<byte>.Shared;
-        const int numbersToWrite = 10000;
-        static Stopwatch timer = new Stopwatch();
+        [Params(10, 1000, 100_000)]
+        public int numbersToWrite { get; set; };
+        private static ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
-        const int itterationsInvariant = 300;
-        const int itterationsCulture = 200;
-
-        public void PrintTime([CallerMemberName] string memberName = "")
+        [GlobalSetup]
+        public void Setup() 
         {
-            //Trace.WriteLine(string.Format("{0} : Elapsed {1}ms", memberName, timer.ElapsedMilliseconds));
+
         }
 
         private void InvariantFormatIntDec()
         {
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            StringFormatter sb = new StringFormatter(numbersToWrite, pool);
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringFormatter sb = new StringFormatter(numbersToWrite, pool);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(((int)(i % 10)));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(((int)(i % 10)));
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void InvariantFormatIntDecClr()
         {
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            StringBuilder sb = new StringBuilder(numbersToWrite);
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringBuilder sb = new StringBuilder(numbersToWrite);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(((int)(i % 10)));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(((int)(i % 10)));
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void InvariantFormatIntHex()
         {
+            StringFormatter sb = new StringFormatter(numbersToWrite, pool);
             StandardFormat format = new StandardFormat('X', StandardFormat.NoPrecision);
 
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringFormatter sb = new StringFormatter(numbersToWrite, pool);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(((int)(i % 10)), format);
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(((int)(i % 10)), format);
             }
-            PrintTime();
+
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void InvariantFormatIntHexClr()
         {
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            StringBuilder sb = new StringBuilder(numbersToWrite);
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringBuilder sb = new StringBuilder(numbersToWrite);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(((int)(i % 10)).ToString("X"));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(((int)(i % 10)).ToString("X"));
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void InvariantFormatStruct()
         {
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            StringFormatter sb = new StringFormatter(numbersToWrite * 2, pool);
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringFormatter sb = new StringFormatter(numbersToWrite * 2, pool);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(new Age(i % 10));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite * 2)
-                {
-                    throw new Exception($"test failed [{text.Length} != {numbersToWrite * 2}]");
-                }
+                sb.Append(new Age(i % 10));
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite * 2)
+            {
+                throw new Exception($"test failed [{text.Length} != {numbersToWrite * 2}]");
+            }
         }
 
         private void FormatGuid()
         {
             var guid = Guid.NewGuid();
             var guidsToWrite = numbersToWrite / 10;
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+
+            StringFormatter sb = new StringFormatter(guidsToWrite * 36, pool);
+            for (int i = 0; i < guidsToWrite; i++)
             {
-                StringFormatter sb = new StringFormatter(guidsToWrite * 36, pool);
-                for (int i = 0; i < guidsToWrite; i++)
-                {
-                    sb.Append(guid);
-                }
-                var text = sb.ToString();
-                if (text.Length != guidsToWrite * 36)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(guid);
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != guidsToWrite * 36)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void InvariantFormatStructClr()
         {
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            StringBuilder sb = new StringBuilder(numbersToWrite * 2);
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                StringBuilder sb = new StringBuilder(numbersToWrite * 2);
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    sb.Append(new Age(i % 10));
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite * 2)
-                {
-                    throw new Exception("test failed");
-                }
+                sb.Append(new Age(i % 10));
             }
-            PrintTime();
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite * 2)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void CustomCultureFormat()
@@ -168,22 +135,18 @@ namespace System.Text.Formatting.Benchmarks
             StringFormatter sb = new StringFormatter(numbersToWrite * 3, pool);
             sb.SymbolTable = CreateCustomCulture();
 
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsCulture; itteration++)
+            sb.Clear();
+            for (int i = 0; i < numbersToWrite; i++)
             {
-                sb.Clear();
-                for (int i = 0; i < numbersToWrite; i++)
-                {
-                    var next = (i % 128) + 101;
-                    sb.Append(next);
-                }
-                var text = sb.ToString();
-                if (text.Length != numbersToWrite * 3)
-                {
-                    throw new Exception("test failed");
-                }
+                var next = (i % 128) + 101;
+                sb.Append(next);
             }
-            PrintTime();
+
+            var text = sb.ToString();
+            if (text.Length != numbersToWrite * 3)
+            {
+                throw new Exception("test failed");
+            }
         }
 
         private void CustomCultureFormatClr()
@@ -191,7 +154,6 @@ namespace System.Text.Formatting.Benchmarks
             StringBuilder sb = new StringBuilder(numbersToWrite * 3);
             var culture = new CultureInfo("th");
 
-            timer.Restart();
             for (int itteration = 0; itteration < itterationsCulture; itteration++)
             {
                 sb.Clear();
@@ -205,7 +167,6 @@ namespace System.Text.Formatting.Benchmarks
                     throw new Exception("test failed");
                 }
             }
-            PrintTime();
         }
 
         private void EncodeStringToUtf8()
@@ -215,18 +176,12 @@ namespace System.Text.Formatting.Benchmarks
             int size = stringsToWrite * text.Length + stringsToWrite;
             ArrayFormatter formatter = new ArrayFormatter(size, SymbolTable.InvariantUtf8, pool);
 
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            formatter.Clear();
+            for (int i = 0; i < stringsToWrite; i++)
             {
-                formatter.Clear();
-                for (int i = 0; i < stringsToWrite; i++)
-                {
-                    formatter.Append(text);
-                    formatter.Append(1);
-                }
-                Assert.Equal(size, formatter.CommitedByteCount);
+                formatter.Append(text);
+                formatter.Append(1);
             }
-            PrintTime();
         }
 
         private void EncodeStringToUtf8Clr()
@@ -236,22 +191,16 @@ namespace System.Text.Formatting.Benchmarks
             int size = stringsToWrite * text.Length + stringsToWrite;
             StringBuilder formatter = new StringBuilder(size);
 
-            timer.Restart();
-            for (int itteration = 0; itteration < itterationsInvariant; itteration++)
+            formatter.Clear();
+            for (int i = 0; i < stringsToWrite; i++)
             {
-                formatter.Clear();
-                for (int i = 0; i < stringsToWrite; i++)
-                {
-                    formatter.Append(text);
-                    formatter.Append(1);
-                }
-                var bytes = Encoding.UTF8.GetBytes(formatter.ToString());
-                Assert.Equal(size, bytes.Length);
+                formatter.Append(text);
+                formatter.Append(1);
             }
-            PrintTime();
+            var bytes = Encoding.UTF8.GetBytes(formatter.ToString());
         }
 
-        static SymbolTable CreateCustomCulture()
+        private static SymbolTable CreateCustomCulture()
         {
             var utf16digitsAndSymbols = new byte[17][];
             for (ushort digit = 0; digit < 10; digit++)
@@ -260,14 +209,10 @@ namespace System.Text.Formatting.Benchmarks
                 var digitString = new string(digitChar, 1);
                 utf16digitsAndSymbols[digit] = GetBytesUtf16(digitString);
             }
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = GetBytesUtf16(".");
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.GroupSeparator] = GetBytesUtf16(",");
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = GetBytesUtf16("_?");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = Unicode.GetBytes(".");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.GroupSeparator] = Unicode.GetBytes(",");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = Unicode.GetBytes("_?");
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
-        }
-        static byte[] GetBytesUtf16(string text)
-        {
-            return System.Text.Encoding.Unicode.GetBytes(text);
         }
     }
 }
