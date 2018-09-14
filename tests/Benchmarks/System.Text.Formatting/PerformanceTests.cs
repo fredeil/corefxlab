@@ -17,15 +17,10 @@ namespace System.Text.Formatting.Benchmarks
     public class PerfSmokeTests
     {
         [Params(10, 1000, 100_000)]
-        public int numbersToWrite { get; set; };
+        private int numbersToWrite;
         private static ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
-        [GlobalSetup]
-        public void Setup() 
-        {
-
-        }
-
+        [Benchmark]
         private void InvariantFormatIntDec()
         {
             StringFormatter sb = new StringFormatter(numbersToWrite, pool);
@@ -40,6 +35,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void InvariantFormatIntDecClr()
         {
             StringBuilder sb = new StringBuilder(numbersToWrite);
@@ -54,6 +50,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void InvariantFormatIntHex()
         {
             StringFormatter sb = new StringFormatter(numbersToWrite, pool);
@@ -71,6 +68,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void InvariantFormatIntHexClr()
         {
             StringBuilder sb = new StringBuilder(numbersToWrite);
@@ -85,6 +83,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void InvariantFormatStruct()
         {
             StringFormatter sb = new StringFormatter(numbersToWrite * 2, pool);
@@ -99,6 +98,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void FormatGuid()
         {
             var guid = Guid.NewGuid();
@@ -116,6 +116,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void InvariantFormatStructClr()
         {
             StringBuilder sb = new StringBuilder(numbersToWrite * 2);
@@ -130,6 +131,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void CustomCultureFormat()
         {
             StringFormatter sb = new StringFormatter(numbersToWrite * 3, pool);
@@ -149,6 +151,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void CustomCultureFormatClr()
         {
             StringBuilder sb = new StringBuilder(numbersToWrite * 3);
@@ -169,6 +172,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void EncodeStringToUtf8()
         {
             string text = "Hello World!";
@@ -184,6 +188,7 @@ namespace System.Text.Formatting.Benchmarks
             }
         }
 
+        [Benchmark]
         private void EncodeStringToUtf8Clr()
         {
             string text = "Hello World!";
@@ -197,6 +202,7 @@ namespace System.Text.Formatting.Benchmarks
                 formatter.Append(text);
                 formatter.Append(1);
             }
+
             var bytes = Encoding.UTF8.GetBytes(formatter.ToString());
         }
 
@@ -209,9 +215,11 @@ namespace System.Text.Formatting.Benchmarks
                 var digitString = new string(digitChar, 1);
                 utf16digitsAndSymbols[digit] = GetBytesUtf16(digitString);
             }
+
             utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = Unicode.GetBytes(".");
             utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.GroupSeparator] = Unicode.GetBytes(",");
             utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = Unicode.GetBytes("_?");
+
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
         }
     }
