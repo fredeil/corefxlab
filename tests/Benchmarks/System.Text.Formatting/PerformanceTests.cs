@@ -4,13 +4,11 @@
 
 using System.Buffers;
 using System.Buffers.Text;
-using System.Text.Encoding;
+using System.Text;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
-
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace System.Text.Formatting.Benchmarks
 {
@@ -216,9 +214,9 @@ namespace System.Text.Formatting.Benchmarks
                 utf16digitsAndSymbols[digit] = GetBytesUtf16(digitString);
             }
 
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = Unicode.GetBytes(".");
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.GroupSeparator] = Unicode.GetBytes(",");
-            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = Unicode.GetBytes("_?");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.DecimalSeparator] = Encoding.Unicode.GetBytes(".");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.GroupSeparator] = Encoding.Unicode.GetBytes(",");
+            utf16digitsAndSymbols[(ushort)SymbolTable.Symbol.MinusSign] = Encoding.Unicode.GetBytes("_?");
 
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
         }
