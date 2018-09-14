@@ -69,7 +69,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatIntHexClr()
         {
-            StringBuilder sb = new StringBuilder(numbersToWrite);
+            var sb = new StringBuilder(numbersToWrite);
             for (int i = 0; i < numbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)).ToString("X"));
@@ -117,7 +117,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatStructClr()
         {
-            StringBuilder sb = new StringBuilder(numbersToWrite * 2);
+            var sb = new StringBuilder(numbersToWrite * 2);
             for (int i = 0; i < numbersToWrite; i++)
             {
                 sb.Append(new Age(i % 10));
@@ -132,7 +132,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void CustomCultureFormat()
         {
-            StringFormatter sb = new StringFormatter(numbersToWrite * 3, pool);
+            var sb = new StringFormatter(numbersToWrite * 3, pool);
             sb.SymbolTable = CreateCustomCulture();
 
             sb.Clear();
