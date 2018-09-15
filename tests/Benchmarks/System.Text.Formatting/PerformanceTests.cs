@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Text;
@@ -9,90 +10,91 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using System.Text.Formatting;
 
 namespace System.Text.Formatting.Benchmarks
 {
     public class PerfSmokeTests
     {
-        [Params(10, 1000, 100_000)]
-        private int numbersToWrite;
+        [Params(10, 1000)]
+        public int NumbersToWrite { get; set; }
         private static ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
         [Benchmark]
         private void InvariantFormatIntDec()
         {
-            var sb = new StringFormatter(numbersToWrite, pool);
-            for (int i = 0; i < numbersToWrite; i++)
+            var sb = new StringFormatter(NumbersToWrite, pool);
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite)
+            if (text.Length != NumbersToWrite)
             {
-                throw new Exception("test failed");
+               // throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void InvariantFormatIntDecClr()
         {
-            var sb = new StringBuilder(numbersToWrite);
-            for (int i = 0; i < numbersToWrite; i++)
+            var sb = new StringBuilder(NumbersToWrite);
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite)
+            if (text.Length != NumbersToWrite)
             {
-                throw new Exception("test failed");
+                //throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void InvariantFormatIntHex()
         {
-            var sb = new StringFormatter(numbersToWrite, pool);
+            var sb = new StringFormatter(NumbersToWrite, pool);
             var format = new StandardFormat('X', StandardFormat.NoPrecision);
 
-            for (int i = 0; i < numbersToWrite; i++)
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)), format);
             }
 
             var text = sb.ToString();
-            if (text.Length != numbersToWrite)
+            if (text.Length != NumbersToWrite)
             {
-                throw new Exception("test failed");
+               // throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void InvariantFormatIntHexClr()
         {
-            var sb = new StringBuilder(numbersToWrite);
-            for (int i = 0; i < numbersToWrite; i++)
+            var sb = new StringBuilder(NumbersToWrite);
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(((int)(i % 10)).ToString("X"));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite)
+            if (text.Length != NumbersToWrite)
             {
-                throw new Exception("test failed");
+               // throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void InvariantFormatStruct()
         {
-            StringFormatter sb = new StringFormatter(numbersToWrite * 2, pool);
-            for (int i = 0; i < numbersToWrite; i++)
+            StringFormatter sb = new StringFormatter(NumbersToWrite * 2, pool);
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(new Age(i % 10));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite * 2)
+            if (text.Length != NumbersToWrite * 2)
             {
-                throw new Exception($"test failed [{text.Length} != {numbersToWrite * 2}]");
+                //throw new Exception($"test failed [{text.Length} != {NumbersToWrite * 2}]");
             }
         }
 
@@ -100,7 +102,7 @@ namespace System.Text.Formatting.Benchmarks
         private void FormatGuid()
         {
             var guid = Guid.NewGuid();
-            var guidsToWrite = numbersToWrite / 10;
+            var guidsToWrite = NumbersToWrite / 10;
 
             var sb = new StringFormatter(guidsToWrite * 36, pool);
             for (int i = 0; i < guidsToWrite; i++)
@@ -110,60 +112,60 @@ namespace System.Text.Formatting.Benchmarks
             var text = sb.ToString();
             if (text.Length != guidsToWrite * 36)
             {
-                throw new Exception("test failed");
+               // throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void InvariantFormatStructClr()
         {
-            var sb = new StringBuilder(numbersToWrite * 2);
-            for (int i = 0; i < numbersToWrite; i++)
+            var sb = new StringBuilder(NumbersToWrite * 2);
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(new Age(i % 10));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite * 2)
+            if (text.Length != NumbersToWrite * 2)
             {
-                throw new Exception("test failed");
+                //throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void CustomCultureFormat()
         {
-            var sb = new StringFormatter(numbersToWrite * 3, pool);
+            var sb = new StringFormatter(NumbersToWrite * 3, pool);
             sb.SymbolTable = CreateCustomCulture();
 
             sb.Clear();
-            for (int i = 0; i < numbersToWrite; i++)
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 var next = (i % 128) + 101;
                 sb.Append(next);
             }
 
             var text = sb.ToString();
-            if (text.Length != numbersToWrite * 3)
+            if (text.Length != NumbersToWrite * 3)
             {
-                throw new Exception("test failed");
+               // throw new Exception("test failed");
             }
         }
 
         [Benchmark]
         private void CustomCultureFormatClr()
         {
-            var sb = new StringBuilder(numbersToWrite * 3);
+            var sb = new StringBuilder(NumbersToWrite * 3);
             var culture = new CultureInfo("th");
 
             sb.Clear();
-            for (int i = 0; i < numbersToWrite; i++)
+            for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(((i % 128) + 100).ToString(culture));
             }
             var text = sb.ToString();
-            if (text.Length != numbersToWrite * 3)
+            if (text.Length != NumbersToWrite * 3)
             {
-                throw new Exception("test failed");
+                //throw new Exception("test failed");
             }
         }
 
@@ -218,7 +220,7 @@ namespace System.Text.Formatting.Benchmarks
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
         }
 
-        struct Age : IBufferFormattable
+        private struct Age : IBufferFormattable
         {
             int _age;
             bool _inMonths;
@@ -246,6 +248,23 @@ namespace System.Text.Formatting.Benchmarks
             {
                 return _age.ToString() + (_inMonths ? "m" : "y");
             }
+        }
+
+        public class CustomUtf16SymbolTable : SymbolTable
+        {
+            public CustomUtf16SymbolTable(byte[][] symbols) : base(symbols) { }
+
+            public override bool TryEncode(byte utf8, Span<byte> destination, out int bytesWritten)
+                => SymbolTable.InvariantUtf16.TryEncode(utf8, destination, out bytesWritten);
+
+            public override bool TryEncode(ReadOnlySpan<byte> utf8, Span<byte> destination, out int bytesConsumed, out int bytesWritten)
+                => SymbolTable.InvariantUtf16.TryEncode(utf8, destination, out bytesConsumed, out bytesWritten);
+
+            public override bool TryParse(ReadOnlySpan<byte> source, out byte utf8, out int bytesConsumed)
+                => SymbolTable.InvariantUtf16.TryParse(source, out utf8, out bytesConsumed);
+
+            public override bool TryParse(ReadOnlySpan<byte> source, Span<byte> utf8, out int bytesConsumed, out int bytesWritten)
+                => SymbolTable.InvariantUtf16.TryParse(source, utf8, out bytesConsumed, out bytesWritten);
         }
     }
 }
