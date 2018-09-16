@@ -12,9 +12,8 @@ using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using System.Text.Formatting;
 
-namespace System.Text.Formatting.Benchmarks
+namespace Benchmarks
 {
-    [MemoryDiagnoser]
     public class StringFormatterPerf
     {
         [Params(10, 1000)]
@@ -22,7 +21,7 @@ namespace System.Text.Formatting.Benchmarks
         private static ArrayPool<byte> pool = ArrayPool<byte>.Shared;
 
         [Benchmark]
-        private void InvariantFormatIntDec()
+        public void InvariantFormatIntDec()
         {
             var sb = new StringFormatter(NumbersToWrite, pool);
             for (int i = 0; i < NumbersToWrite; i++)
@@ -34,7 +33,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void InvariantFormatIntDecClr()
+        public void InvariantFormatIntDecClr()
         {
             var sb = new StringBuilder(NumbersToWrite);
             for (int i = 0; i < NumbersToWrite; i++)
@@ -46,7 +45,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void InvariantFormatIntHex()
+        public void InvariantFormatIntHex()
         {
             var sb = new StringFormatter(NumbersToWrite, pool);
             var format = new StandardFormat('X', StandardFormat.NoPrecision);
@@ -60,7 +59,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void InvariantFormatIntHexClr()
+        public void InvariantFormatIntHexClr()
         {
             var sb = new StringBuilder(NumbersToWrite);
             for (int i = 0; i < NumbersToWrite; i++)
@@ -72,7 +71,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void InvariantFormatStruct()
+        public void InvariantFormatStruct()
         {
             var sb = new StringFormatter(NumbersToWrite * 2, pool);
             for (int i = 0; i < NumbersToWrite; i++)
@@ -84,7 +83,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void FormatGuid()
+        public void FormatGuid()
         {
             var guid = Guid.NewGuid();
             var guidsToWrite = NumbersToWrite / 10;
@@ -99,7 +98,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void InvariantFormatStructClr()
+        public void InvariantFormatStructClr()
         {
             var sb = new StringBuilder(NumbersToWrite * 2);
             for (int i = 0; i < NumbersToWrite; i++)
@@ -111,7 +110,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void CustomCultureFormat()
+        public void CustomCultureFormat()
         {
             var sb = new StringFormatter(NumbersToWrite * 3, pool);
             sb.SymbolTable = CreateCustomCulture();
@@ -127,7 +126,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void CustomCultureFormatClr()
+        public void CustomCultureFormatClr()
         {
             var sb = new StringBuilder(NumbersToWrite * 3);
             var culture = new CultureInfo("th");
@@ -142,7 +141,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void EncodeStringToUtf8()
+        public void EncodeStringToUtf8()
         {
             string text = "Hello World!";
             int stringsToWrite = 2000;
@@ -158,7 +157,7 @@ namespace System.Text.Formatting.Benchmarks
         }
 
         [Benchmark]
-        private void EncodeStringToUtf8Clr()
+        public void EncodeStringToUtf8Clr()
         {
             string text = "Hello World!";
             int stringsToWrite = 2000;
@@ -175,7 +174,7 @@ namespace System.Text.Formatting.Benchmarks
             var bytes = Encoding.UTF8.GetBytes(formatter.ToString());
         }
 
-        private static SymbolTable CreateCustomCulture()
+        public static SymbolTable CreateCustomCulture()
         {
             var utf16digitsAndSymbols = new byte[17][];
             for (ushort digit = 0; digit < 10; digit++)
@@ -192,7 +191,7 @@ namespace System.Text.Formatting.Benchmarks
             return new CustomUtf16SymbolTable(utf16digitsAndSymbols);
         }
 
-        private struct Age : IBufferFormattable
+        public struct Age : IBufferFormattable
         {
             int _age;
             bool _inMonths;
