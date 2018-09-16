@@ -14,6 +14,7 @@ using System.Text.Formatting;
 
 namespace System.Text.Formatting.Benchmarks
 {
+    [MemoryDiagnoser]
     public class StringFormatterPerf
     {
         [Params(10, 1000)]
