@@ -14,7 +14,7 @@ using System.Text.Formatting;
 
 namespace System.Text.Formatting.Benchmarks
 {
-    public class PerfSmokeTests
+    public class StringFormatterPerf
     {
         [Params(10, 1000)]
         public int NumbersToWrite { get; set; }
