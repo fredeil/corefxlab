@@ -28,11 +28,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(((int)(i % 10)));
             }
+
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite)
-            {
-               // throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -43,11 +40,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(((int)(i % 10)));
             }
+
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite)
-            {
-                //throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -62,10 +56,6 @@ namespace System.Text.Formatting.Benchmarks
             }
 
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite)
-            {
-               // throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -76,11 +66,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(((int)(i % 10)).ToString("X"));
             }
+
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite)
-            {
-               // throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -91,11 +78,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(new Age(i % 10));
             }
+
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite * 2)
-            {
-                //throw new Exception($"test failed [{text.Length} != {NumbersToWrite * 2}]");
-            }
         }
 
         [Benchmark]
@@ -109,11 +93,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(guid);
             }
+
             var text = sb.ToString();
-            if (text.Length != guidsToWrite * 36)
-            {
-               // throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -124,11 +105,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(new Age(i % 10));
             }
+
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite * 2)
-            {
-                //throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -145,10 +123,6 @@ namespace System.Text.Formatting.Benchmarks
             }
 
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite * 3)
-            {
-               // throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
@@ -162,11 +136,8 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(((i % 128) + 100).ToString(culture));
             }
+            
             var text = sb.ToString();
-            if (text.Length != NumbersToWrite * 3)
-            {
-                //throw new Exception("test failed");
-            }
         }
 
         [Benchmark]
