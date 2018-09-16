@@ -73,7 +73,7 @@ namespace System.Text.Formatting.Benchmarks
         [Benchmark]
         private void InvariantFormatStruct()
         {
-            StringFormatter sb = new StringFormatter(NumbersToWrite * 2, pool);
+            var sb = new StringFormatter(NumbersToWrite * 2, pool);
             for (int i = 0; i < NumbersToWrite; i++)
             {
                 sb.Append(new Age(i % 10));
@@ -136,7 +136,7 @@ namespace System.Text.Formatting.Benchmarks
             {
                 sb.Append(((i % 128) + 100).ToString(culture));
             }
-            
+
             var text = sb.ToString();
         }
 
